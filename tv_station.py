@@ -4,7 +4,7 @@ import pymongo
 import datetime
 import numpy as np
 from tv import get_tv_station_ranks_from_db,find_init_rank, get_trans
-from rank_aggr_annealing_v3 import annealing
+from rank_aggr_annealing import annealing
 
 def main():
     tv_station_list = [u'湖南卫视',u'东方卫视',u'安徽卫视',u'浙江卫视',u'北京卫视',

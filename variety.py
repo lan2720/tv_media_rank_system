@@ -10,7 +10,7 @@ import datetime
 import pymongo
 import numpy as np
 from tv import find_init_rank, get_trans
-from rank_aggr_annealing_v3 import annealing
+from rank_aggr_annealing import annealing
 from pyquery import PyQuery as pq
 
 accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'

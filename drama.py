@@ -10,7 +10,7 @@ import datetime
 import pymongo
 import random
 import numpy as np
-from rank_aggr_annealing import *
+from rank_aggr_annealing import annealing
 from xml.etree import ElementTree
 from pyquery import PyQuery as pq
 
