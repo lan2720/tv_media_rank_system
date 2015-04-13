@@ -101,11 +101,11 @@ def get_today_programs(tv_coll, drama_to_crawl_coll, today_drama_coll, today_var
                  'name': tv})
             print "################################"
             time.sleep(random.uniform(4, 5))
-    #     tv_coll.insert(posts)
-    #     today_drama_coll.update({'date': date}, {'$set': {'dramas': today_dramas.keys()}}, upsert=True)
-    #     today_variety_coll.update({'date': date}, {'$set': {'varieties': today_varieties.keys()}}, upsert=True)
-    #     print "--------------------------------"
-    # drama_to_crawl_coll.update({'date': today}, {'$set': {'dramas': dramas.keys()}}, upsert=True)
+        tv_coll.insert(posts)
+        today_drama_coll.update({'date': date}, {'$set': {'dramas': today_dramas.keys()}}, upsert=True)
+        today_variety_coll.update({'date': date}, {'$set': {'varieties': today_varieties.keys()}}, upsert=True)
+        print "--------------------------------"
+    drama_to_crawl_coll.update({'date': today}, {'$set': {'dramas': dramas.keys()}}, upsert=True)
 
 
 def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll):
@@ -154,7 +154,7 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                                 or u'典礼' in name or u'直播' in name or u'东方眼' in name or u'新干线' in name \
                                 or u'纪录片' in name or u'气象' in name or u'娱乐' in name or u'看点' in name \
                                 or u'歌曲' in name or u'电影' in name or u'影院' in name or u'预告' in name \
-                                or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'音乐盛典' in name \
+                                or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'盛典' in name \
                                 or u'海峡' in name or u'金穗双联' in name or u'年度人物' in name or u'开幕式' in name:
                             continue
                         else:
@@ -167,9 +167,9 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                     else:
                         pass
             posts.append({'date': today, 'name': tvname, 'drama': dramas.keys(), 'variety': varieties.keys()})
-        # tv_coll.insert(posts)
-        # today_drama_coll.update({'date': today}, {'$set': {'dramas': all_drama_today.keys()}}, upsert=True)
-        # today_variety_coll.update({'date': today}, {'$set': {'varieties': all_variety_today.keys()}}, upsert=True)
+        tv_coll.insert(posts)
+        today_drama_coll.update({'date': today}, {'$set': {'dramas': all_drama_today.keys()}}, upsert=True)
+        today_variety_coll.update({'date': today}, {'$set': {'varieties': all_variety_today.keys()}}, upsert=True)
 
 
 def get_a_week_drama_variety():
@@ -215,7 +215,7 @@ def get_a_week_drama_variety():
                                     or u'典礼' in name or u'直播' in name or u'东方眼' in name or u'新干线' in name \
                                     or u'纪录片' in name or u'气象' in name or u'娱乐' in name or u'看点' in name \
                                     or u'歌曲' in name or u'电影' in name or u'影院' in name or u'预告' in name \
-                                    or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'音乐盛典' in name \
+                                    or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'盛典' in name \
                                     or u'海峡' in name or u'金穗双联' in name or u'年度人物' in name or u'开幕式' in name:
                                 continue
                             else:
@@ -733,9 +733,7 @@ def get_drama_ranks_from_db(websites, today_drama_coll, dramas_coll, today):
 
     rows = dict(zip(websites, range(10)))  # 10个视频网站
     cols = dict(zip(today_rank_list, range(len(today_rank_list))))  # 今日播出的电视剧且有资源的
-    # for website, seq in rows.iteritems():
-    #     print website, seq
-    # print "########################################"
+
     for drama, seq in cols.iteritems():
         print drama, seq
     print "########################################"
@@ -794,8 +792,8 @@ def get_each_drama_playcount(dramas_collection, drama_to_crawl):
                 print link
                 srcs.setdefault(website, 0)
                 srcs[website] += parsers[website](link)
-        # if srcs != {}:  # 如果电视剧没有资源, 就不存这部电视剧,等到它有播放量了为止
-        #     dramas_collection.update({'name': drama, 'date': date}, {'$set': {'srcs': srcs}}, upsert=True)
+        if srcs != {}:  # 如果电视剧没有资源, 就不存这部电视剧,等到它有播放量了为止
+            dramas_collection.update({'name': drama, 'date': date}, {'$set': {'srcs': srcs}}, upsert=True)
 
 
 def find_init_rank(ranks):
@@ -858,7 +856,6 @@ def get_tv_station_ranks_from_db(websites, tv_station_list, tv_coll, varieties_c
             a[pos_dic[val]] = idx + 1
 
     return ranks
-            # print list(varieties_coll.find({'name':show}, {'srcs':1, '_id':0}).sort('date',pymongo.DESCENDING).limit(1))
 
 def main():
     websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
@@ -884,16 +881,16 @@ def main():
     get_each_drama_playcount(dramas_coll,drama_to_crawl)
     end_time = time.time()
     print "###################runtime for crawling playmount:",end_time - start_time
-    # ranks,today_rank_list = get_drama_ranks_from_db(websites, today_drama_coll, dramas_coll, today)
-    # init_rank = find_init_rank(ranks)
-    # print "init drama rank:",init_rank
-    # new_rank, new_tau = annealing(ranks=ranks, cur_rank=init_rank, temperature_begin=300, temperature_end=0.1,
-    #                               cooling_factor=.95, nb_iterations=200)
-    # print "aggregated drama rank:", new_rank, new_tau
+    ranks,today_rank_list = get_drama_ranks_from_db(websites, today_drama_coll, dramas_coll, today)
+    init_rank = find_init_rank(ranks)
+    print "init drama rank:",init_rank
+    new_rank, new_tau = annealing(ranks=ranks, cur_rank=init_rank, temperature_begin=300, temperature_end=0.1,
+                                  cooling_factor=.95, nb_iterations=200)
+    print "aggregated drama rank:", new_rank, new_tau
     
-    # # 将排名存入数据库
-    # get_trans(new_rank, today_rank_list, drama_rank_coll, today)
-    # print "#############每日 电视剧 排名已完成存储############"
+    # 将排名存入数据库
+    get_trans(new_rank, today_rank_list, drama_rank_coll, today)
+    print "#############每日 电视剧 排名已完成存储############"
 
 if __name__ == '__main__':
     main()
