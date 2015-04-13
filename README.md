@@ -12,7 +12,7 @@
 
 在抓取到每日节目单后，在全国10大视频网站上获取相应节目的播放量，进行存储，在每个网站内部先排序。
 根据每个网站所得数据内部排序后，为了得到一个完整的排行榜，需要将10个排序融合(即rank aggregation)，在一定迭代次数内search到相对最佳的final rank。
-所使用的search算法是simulated annealling
+所使用的search算法是simulated annealing
 
 最终结果：
 
