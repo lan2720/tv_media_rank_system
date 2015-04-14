@@ -1,5 +1,7 @@
 #coding:utf-8
 
+# 每日爬取当日的综艺节目即可 不需要从一周综艺中爬
+
 import requests
 import sys
 import time
@@ -687,16 +689,8 @@ def get_variety_ranks_from_db(varieties_coll, today): # today is datetime.dateti
 	
 	return ranks, today_rank_list  # 用,分隔的
 
-def main():
-	db = pymongo.mongo_client.MongoClient(host='202.120.38.146')['tv_media']
-	varieties_coll = db.varieties
-	today_variety_coll = db.today_variety
-	variety_rank_coll = db.variety_rank
-	today = datetime.datetime.now()
+def get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll):
 	today_variety_list = today_variety_coll.find_one({'date': today.strftime("%Y-%m-%d")}, {'varieties': 1, '_id': 0}, timeout=False)['varieties']
-	# for keyword in today_variety_list:
-	# 	get_varieties_playcount_and_store(keyword, varieties_coll, today.strftime("%Y-%m-%d"))
-	# print "#############今日 综艺 播放量已存储#############"
 	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll, today)
 	print "#############全网 综艺 排名已完成##############"
 	init_rank = find_init_rank(ranks)
@@ -708,8 +702,5 @@ def main():
     # 将排名存入数据库
 	get_trans(init_rank, today_rank_list, variety_rank_coll, today)
 	print "#############每日 综艺 排名已完成存储############"
-
-if __name__ == '__main__':
-	main()
 
 

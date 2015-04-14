@@ -27,87 +27,6 @@ tvs = ['cctv1', 'cctv8', 'anhui', 'btv1', 'chongqing', 'dongfang', 'dongnan', 'g
 repl = ' 0123456789'
 pat = re.compile(r'\(.*\)')  # 去除 (重播)
 
-
-def get_today_programs(tv_coll, drama_to_crawl_coll, today_drama_coll, today_variety_coll):
-    url = 'http://tv.cntv.cn/index.php'
-    today = datetime.datetime.now()
-    tomorrow = get_tomorrow(today)
-    today = today.strftime("%Y-%m-%d")
-    dates = [today, tomorrow]
-    s = requests.Session()
-    s.get('http://tv.cntv.cn/epg')
-    dramas = {}  # 综合今天和明天的所有电视剧
-    for date in dates:
-        today_varieties = {}
-        today_dramas = {}
-        posts = []
-        for tv in tvs:
-            each_tv_dramas = {'drama': {}, 'variety': {}}
-            params = {'action': 'epg-list', 'date': date, 'channel': tv}
-            while True:
-                try:
-                    page = s.get(url=url, params=params,
-                                 headers={'Referer': 'http://tv.cntv.cn/epg', 'X-Requested-With': 'XMLHttpRequest'},
-                                 timeout=3, allow_redirects=False)
-                except (socket.timeout, requests.exceptions.Timeout):  # socket.timeout
-                    print "timeout", url
-                except requests.exceptions.ConnectionError:
-                    print "connection error", url
-                else:
-                    break
-            for nt in pq(page.text)('div.bflb_content_r')('div.content_c')('dd'):
-                # print nt.text()
-                nt = pq(nt)('a').eq(0).text()
-                ctime = nt.split(' ')[0]
-                if int(ctime.replace(':', '')) not in range(1930, 2200):
-                    continue
-                name = nt.split(' ')[1]
-                if name == u'电视剧':
-                    continue
-                if u'纪录片' in name:
-                    continue
-                if u'本集' in name or u'花絮' in name or u'新闻' in name or u'焦点' in name \
-                        or u'天气' in name or u'抢先看' in name or u'收视' in name or u'中超' in name \
-                        or u'报道' in name or u'要闻' in name or u'今日' in name or u'提要' in name \
-                        or u'典礼' in name or u'直播' in name or u'东方眼' in name or u'新干线' in name:
-                    continue
-                if u'电视剧' in name:
-                    name = name[4:]
-                    if ";" in name:
-                        for i in name.split[';']:
-                            i = i.strip(rep_pat)
-                            print ctime, i, "drama"
-                            each_tv_dramas['drama'].setdefault(i, None)
-                            dramas.setdefault(i, None)
-                            today_dramas.setdefault(i, name)
-                    else:
-                        name = name.strip(rep_pat)
-                        print ctime, name, "drama"
-                        each_tv_dramas['drama'].setdefault(name, None)
-                        dramas.setdefault(name, None)
-                        today_dramas.setdefault(name, None)
-                elif u'首播' in name:
-                    name = name[3:].strip(rep_pat)
-                    print ctime, name, "variety"
-                    each_tv_dramas['variety'].setdefault(name, None)
-                    today_varieties.setdefault(name, None)
-                else:
-                    name = name.strip(rep_pat)
-                    print ctime, name, "variety"
-                    each_tv_dramas['variety'].setdefault(name, None)
-                    today_varieties.setdefault(name, None)
-            posts.append(
-                {'date': date, 'drama': each_tv_dramas['drama'].keys(), 'variety': each_tv_dramas['variety'].keys(),
-                 'name': tv})
-            print "################################"
-            time.sleep(random.uniform(4, 5))
-        tv_coll.insert(posts)
-        today_drama_coll.update({'date': date}, {'$set': {'dramas': today_dramas.keys()}}, upsert=True)
-        today_variety_coll.update({'date': date}, {'$set': {'varieties': today_varieties.keys()}}, upsert=True)
-        print "--------------------------------"
-    drama_to_crawl_coll.update({'date': today}, {'$set': {'dramas': dramas.keys()}}, upsert=True)
-
-
 def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll):
     posts = []
     all_drama_today = {}
@@ -228,10 +147,6 @@ def get_a_week_drama_variety():
                             pass
         outfile1.write((' '.join(dramas.keys())).encode('utf-8'))
         outfile2.write((' '.join(varieties.keys())).encode('utf-8'))
-
-
-def get_tomorrow(date):  # date:datetime.datetime
-    return (date + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
 def search_in_all(drama_name):
@@ -822,7 +737,6 @@ def get_trans(rank, today_rank_list, drama_rank_coll, today):
     return final_rank
 
 def get_tv_station_ranks_from_db(websites, tv_station_list, tv_coll, varieties_coll):
-   
     rows = dict(zip(websites, range(10)))  # 10个视频网站
     cols = dict(zip(tv_station_list, range(len(tv_station_list)))) # 30个电视台
     ranks = np.zeros((10, len(tv_station_list)), dtype=np.int64)  #.fill(-1)
@@ -857,30 +771,10 @@ def get_tv_station_ranks_from_db(websites, tv_station_list, tv_coll, varieties_c
 
     return ranks
 
-def main():
-    websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
-    db = pymongo.mongo_client.MongoClient(host='202.120.38.146')['tv_media']
-    tv_coll = db.tv
-    today_drama_coll = db.today_drama
-    today_variety_coll = db.today_variety
-    dramas_coll = db.dramas
-    drama_rank_coll = db.drama_rank
-    varieties_coll = db.varieties
-    today = datetime.datetime.now()
-    day_of_week = today.strftime('%w')
-    if day_of_week == '0':
-        day_of_week = '7'
-    get_a_day_tv_list(day_of_week,tv_coll,today_drama_coll,today_variety_coll)
-    print "###################get today tv lists finished#################"
-    if day_of_week == '1':
-    	get_a_week_drama_variety()
-        print "------------------get a week drama and variety list-----------------"
-    drama_to_crawl = open('a_week_drama.txt','r').read().decode('utf-8').split(' ')
+def get_drama_rank(today, websites, drama_to_crawl, dramas_coll, today_drama_coll, drama_rank_coll):
     print "###################drama list for crawling ready###################"
-    start_time = time.time()
     get_each_drama_playcount(dramas_coll,drama_to_crawl)
-    end_time = time.time()
-    print "###################runtime for crawling playmount:",end_time - start_time
+    print "################## drama playcount crawl finish ###################"
     ranks,today_rank_list = get_drama_ranks_from_db(websites, today_drama_coll, dramas_coll, today)
     init_rank = find_init_rank(ranks)
     print "init drama rank:",init_rank
@@ -891,10 +785,5 @@ def main():
     # 将排名存入数据库
     get_trans(new_rank, today_rank_list, drama_rank_coll, today)
     print "#############每日 电视剧 排名已完成存储############"
-
-if __name__ == '__main__':
-    main()
-
-
 
 
