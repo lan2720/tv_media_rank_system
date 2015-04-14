@@ -3,10 +3,15 @@
 import pymongo
 import datetime
 import numpy as np
+<<<<<<< HEAD
 from tv import get_tv_station_ranks_from_db,find_init_rank, get_trans
+=======
+from drama import get_tv_station_ranks_from_db,find_init_rank, get_trans
+>>>>>>> dev
 from rank_aggr_annealing import annealing
 
 def main():
+    websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
     tv_station_list = [u'湖南卫视',u'东方卫视',u'安徽卫视',u'浙江卫视',u'北京卫视',
                         u'山东卫视',u'江苏卫视',u'江西卫视',u'河南卫视',u'重庆卫视',
                         u'东南卫视',u'广西卫视',u'四川卫视',u'广东卫视',u'吉林卫视',
