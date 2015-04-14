@@ -9,8 +9,8 @@ import socket
 import datetime
 import pymongo
 import numpy as np
-from tv import find_init_rank, get_trans
-from rank_aggr_annealing_v3 import annealing
+from drama import find_init_rank, get_trans
+from rank_aggr_annealing import annealing
 from pyquery import PyQuery as pq
 
 accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
@@ -694,17 +694,17 @@ def main():
 	variety_rank_coll = db.variety_rank
 	today = datetime.datetime.now()
 	today_variety_list = today_variety_coll.find_one({'date': today.strftime("%Y-%m-%d")}, {'varieties': 1, '_id': 0}, timeout=False)['varieties']
-	for keyword in today_variety_list:
-		get_varieties_playcount_and_store(keyword, varieties_coll, today.strftime("%Y-%m-%d"))
-	print "#############今日 综艺 播放量已存储#############"
+	# for keyword in today_variety_list:
+	# 	get_varieties_playcount_and_store(keyword, varieties_coll, today.strftime("%Y-%m-%d"))
+	# print "#############今日 综艺 播放量已存储#############"
 	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll, today)
 	print "#############全网 综艺 排名已完成##############"
 	init_rank = find_init_rank(ranks)
-	print "init variety rank:", nit_rank
+	print "init variety rank:", init_rank
 	new_rank, new_tau = annealing(ranks=ranks, cur_rank=init_rank, temperature_begin=300, temperature_end=0.1,
                                   cooling_factor=.95, nb_iterations=200)
 	print "aggregated rank:", new_rank, new_tau
-    print "#############排名融合已完成#############"
+	print "#############排名融合已完成#############"
     # 将排名存入数据库
 	get_trans(init_rank, today_rank_list, variety_rank_coll, today)
 	print "#############每日 综艺 排名已完成存储############"
