@@ -859,7 +859,7 @@ def get_tv_station_ranks_from_db(websites, tv_station_list, tv_coll, varieties_c
 
 def main():
     websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
-    db = pymongo.mongo_client.MongoClient(host='127.0.0.1')['tv_media']
+    db = pymongo.mongo_client.MongoClient(host='202.120.38.146')['tv_media']
     tv_coll = db.tv
     today_drama_coll = db.today_drama
     today_variety_coll = db.today_variety

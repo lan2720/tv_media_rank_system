@@ -14,7 +14,7 @@ def main():
                         u'山西卫视',u'云南卫视',u'天津卫视',u'辽宁卫视',u'湖北卫视',
                         u'陕西卫视',u'贵州卫视',u'河北卫视',u'黑龙江卫视',u'宁夏卫视',
                         u'青海卫视',u'甘肃卫视',u'内蒙古卫视',u'新疆卫视',u'深圳卫视']
-    db = pymongo.mongo_client.MongoClient(host='127.0.0.1')['tv_media']
+    db = pymongo.mongo_client.MongoClient(host='202.120.38.146')['tv_media']
     tv_coll = db.tv
     varieties_coll = db.varieties
     station_rank_coll = db.station_rank

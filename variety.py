@@ -688,7 +688,7 @@ def get_variety_ranks_from_db(varieties_coll, today): # today is datetime.dateti
 	return ranks, today_rank_list  # 用,分隔的
 
 def main():
-	db = pymongo.mongo_client.MongoClient(host='127.0.0.1')['tv_media']
+	db = pymongo.mongo_client.MongoClient(host='202.120.38.146')['tv_media']
 	varieties_coll = db.varieties
 	today_variety_coll = db.today_variety
 	variety_rank_coll = db.variety_rank
