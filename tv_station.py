@@ -3,11 +3,7 @@
 import pymongo
 import datetime
 import numpy as np
-<<<<<<< HEAD
-from tv import get_tv_station_ranks_from_db,find_init_rank, get_trans
-=======
 from drama import get_tv_station_ranks_from_db,find_init_rank, get_trans
->>>>>>> dev
 from rank_aggr_annealing import annealing
 
 def main():

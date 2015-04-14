@@ -9,11 +9,7 @@ import socket
 import datetime
 import pymongo
 import numpy as np
-<<<<<<< HEAD
-from tv import find_init_rank, get_trans
-=======
 from drama import find_init_rank, get_trans
->>>>>>> dev
 from rank_aggr_annealing import annealing
 from pyquery import PyQuery as pq
 
