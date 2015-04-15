@@ -50,21 +50,26 @@ def search_in_baidu(keyword, last_fri, today):
 			print "timeout", query_url
 		except requests.exceptions.ConnectionError:
 			print "connection error", query_url
+		except KeyError:
+			print "baidu search page error"
 		else:
 			break
 
 	if len(result_json) == 0: # 如果搜不到结果pass
 		return {}
 
-	if u'actor' in result_json[0] or u'director' in result_json[0]:
-		try:
-			result = result_json[1] # 说明排在搜索第一位置的是一个电视剧 选排在第二的 如果没有第二的结果就pass
-		except IndexError:
-			return {}
-	else:
-		result = result_json[0]
-	vid = result['id']
-	
+	found = False
+	for result in result_json:
+		if u'actor' in result or u'director' in result:
+			continue
+		else:	# 找到第一个综艺节目就退出
+			vid = result['id']
+			found = True
+			break
+			
+	if not found: # 如果所有的结果都没有综艺节目 就返回{}
+		return {}
+
 	sites = {}
 	for site in result['sites']:
 		name = site['site_url'].split('.')[0]
@@ -85,15 +90,19 @@ def search_in_baidu(keyword, last_fri, today):
 												   				 'Accept-Encoding':encode,
 												   				 'Connection':connection,
 												   				 'User-Agent':iphone}, timeout = 2)
+				d = json.loads(srcs_page.text)
+				videos_list = d['videos']
 			except (socket.timeout, requests.exceptions.Timeout):
 				print "timeout", findSrc_url
 			except requests.exceptions.ConnectionError:
 				print "connection error", findSrc_url
+			except KeyError:
+				print "baidu search apage error"
 			else:
 				break
-		d = json.loads(srcs_page.text)
-		if d['videos']: # 每个网站上这个星期之内播放的节目链接
-			for video in d['videos']:
+		
+		if videos_list: # 每个网站上这个星期之内播放的节目链接
+			for video in videos_list:
 				if video['episode'] >= last_fri and video['episode'] < today:
 					srcs.setdefault(chinese_name,[])
 					srcs[chinese_name].append(video['url'])
@@ -178,28 +187,6 @@ def search_in_soku(keyword):
 					srcs[name] = link
 			break # 只要找到一个综艺节目 后面的就不找了
 	return srcs
-
-def test(keyword):
-	url = 'http://www.soku.com/v?keyword={}'.format(keyword)
-	last_fri = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%m%d")
-	today = datetime.datetime.now().strftime("%m%d")
-	print last_fri, today
-	while True:
-		try:
-			main_page = requests.get(url, headers = {'Accept':accept,
-													 'Accept-Encoding':encode,
-													 'Accept-Language':chinese,
-													 'Connection':connection,
-													 'Host':'www.soku.com',
-													 'User-Agent':chrome}, timeout = 2, allow_redirects = False).text
-		except (socket.timeout, requests.exceptions.Timeout):
-			print "timeout", url
-		except requests.exceptions.ConnectionError:
-			print "connection error", url
-		else:
-			break
-	print pq(main_page)('div.DIR')('div.item')('div.zy')('div.detail')('div.T')('div.linkpanels.linkpanels_zy.site14')('div.items')('ul.v')('li.v_title').filter(lambda i, this: 
-						pq(this)('span.phases').text().replace('-','') == '0409')
 
 def iqiyi_variety_parser(url):
 	vid_pat = re.compile(r'(?<=albumId:).*?(?=,)', re.M)
@@ -649,8 +636,7 @@ def get_varieties_playcount_and_store(keyword, varieties_coll, date): # a list
 			print link
 			playcount += parsers[site](link)
 		count_results[site] = playcount
-
-	# print json.dumps(count_results, indent = 4, ensure_ascii = False)
+	count_results = dict(filter(lambda x: x[1] != 0, count_results.items())) # 去除播放数的0的网站数据
 	if count_results:
 		varieties_coll.update({'name': keyword, 'date': date}, {'$set': {'srcs': count_results}}, upsert=True)
 
@@ -691,6 +677,8 @@ def get_variety_ranks_from_db(varieties_coll, today): # today is datetime.dateti
 
 def get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll):
 	today_variety_list = today_variety_coll.find_one({'date': today.strftime("%Y-%m-%d")}, {'varieties': 1, '_id': 0}, timeout=False)['varieties']
+	for variety in today_variety_list:
+		get_varieties_playcount_and_store(variety, varieties_coll, today.strftime("%Y-%m-%d"))
 	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll, today)
 	print "#############全网 综艺 排名已完成##############"
 	init_rank = find_init_rank(ranks)
@@ -703,4 +691,10 @@ def get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll):
 	get_trans(init_rank, today_rank_list, variety_rank_coll, today)
 	print "#############每日 综艺 排名已完成存储############"
 
+def test():
+	last_fri = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y%m%d")
+	today = datetime.datetime.now().strftime("%Y%m%d")
+	search_in_baidu('群英会',last_fri,today)
 
+if __name__ == '__main__':
+	test()

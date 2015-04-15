@@ -218,21 +218,22 @@ def search_in_all(drama_name):
     return result_dict
 
 def tudou_parser(url):  # 没问题
+    lid_pat = re.compile(r'(?<=,lid: )\d+', re.M)
     while True:
         try:
             tudou_page = requests.get(url, headers={'Host': 'www.tudou.com', 'User-Agent': chrome}, timeout=2,
                                       allow_redirects=False).text
+            lid = re.search(lid_pat, tudou_page).group()
         except (socket.timeout, requests.exceptions.Timeout):
             print "timeout", url
         except requests.exceptions.ConnectionError:
             print "connection error", url
+        except AttributeError:
+            print "tudou main page error"
         else:
             break
-    lid_pat = re.compile(r'(?<=,lid: )\d+', re.M)
-    lid = re.search(lid_pat, tudou_page).group()
     # 请求iid_list的页面url需要lid号
-    iids_url = 'http://www.tudou.com/tvp/alist.action?jsoncallback=page_play_model_aListModelList__findAll&areaCode=310000&a={}&app=4'.format(
-        lid)
+    iids_url = 'http://www.tudou.com/tvp/alist.action?jsoncallback=page_play_model_aListModelList__findAll&areaCode=310000&a={}&app=4'.format(lid)
     while True:
         try:
             iids_page = requests.get(iids_url, headers={'Referer': url, 'User-Agent': chrome}, timeout=2).text
@@ -707,6 +708,7 @@ def get_each_drama_playcount(dramas_collection, drama_to_crawl):
                 print link
                 srcs.setdefault(website, 0)
                 srcs[website] += parsers[website](link)
+        srcs = dict(filter(lambda x: x[1] != 0, srcs.items())) # 去除播放数的0的网站数据
         if srcs != {}:  # 如果电视剧没有资源, 就不存这部电视剧,等到它有播放量了为止
             dramas_collection.update({'name': drama, 'date': date}, {'$set': {'srcs': srcs}}, upsert=True)
 
