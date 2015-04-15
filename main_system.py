@@ -27,15 +27,15 @@ def main():
     day_of_week = today.strftime('%w')
     if day_of_week == '0':
         day_of_week = '7'
-    # get_a_day_tv_list(day_of_week,tv_coll,today_drama_coll,today_variety_coll)
-    # print "###################get today tv lists finished#################"
-    # if day_of_week == '1':
-    # 	get_a_week_drama_variety()
-    #     print "------------------get a week drama and variety list-----------------"
-    # drama_to_crawl = open('a_week_drama.txt','r').read().decode('utf-8').split(' ')
+    get_a_day_tv_list(day_of_week,tv_coll,today_drama_coll,today_variety_coll)
+    print "###################get today tv lists finished#################"
+    if day_of_week == '1':
+    	get_a_week_drama_variety()
+        print "------------------get a week drama and variety list-----------------"
+    drama_to_crawl = open('a_week_drama.txt','r').read().decode('utf-8').split(' ')
 
-    # #################### 电视剧 ####################
-    # get_drama_rank(today, websites, drama_to_crawl, dramas_coll, today_drama_coll, drama_rank_coll)
+    #################### 电视剧 ####################
+    get_drama_rank(today, websites, drama_to_crawl, dramas_coll, today_drama_coll, drama_rank_coll)
 
     #################### 综艺 #####################
     get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll)
