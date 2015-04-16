@@ -6,9 +6,6 @@ import datetime
 from drama import get_drama_rank,get_a_day_tv_list,get_a_week_drama_variety
 from variety import get_variety_rank
 from tv_station import get_tv_station_rank
-import sys
-import codecs
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 BASE_DIR = os.path.dirname(__file__)
 
