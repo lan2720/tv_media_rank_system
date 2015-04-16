@@ -5,6 +5,7 @@ import requests
 import socket
 import json
 import re
+import os
 import time
 import datetime
 import pymongo
@@ -27,12 +28,14 @@ tvs = ['cctv1', 'cctv8', 'anhui', 'btv1', 'chongqing', 'dongfang', 'dongnan', 'g
 repl = ' 0123456789'
 pat = re.compile(r'\(.*\)')  # 去除 (重播)
 
+BASE_DIR = os.path.dirname(__file__)
+
 def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll):
     posts = []
     all_drama_today = {}
     all_variety_today = {}
     today = datetime.datetime.now().strftime('%Y-%m-%d')
-    with open('qq_hrefs.txt', 'r') as infile:
+    with open(os.path.join(BASE_DIR,'qq_hrefs.txt'), 'r') as infile:
         for line in infile:
             dramas = {}  # 每个电视台每天都有这个
             varieties = {}
@@ -94,7 +97,7 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
 def get_a_week_drama_variety():
     dramas = {}
     varieties = {}
-    with open('qq_hrefs.txt', 'r') as infile, open('a_week_drama.txt', 'w+') as outfile1,open('a_week_variety.txt','w+') as outfile2:
+    with open(os.path.join(BASE_DIR,'qq_hrefs.txt'), 'r') as infile, open(os.path.join(BASE_DIR,'a_week_drama.txt'), 'w+') as outfile1,open(os.path.join(BASE_DIR,'a_week_variety.txt'),'w+') as outfile2:
         for line in infile:
             for i in range(1, 8):
                 url = line.strip().split('\t')[0].format(str(i))
