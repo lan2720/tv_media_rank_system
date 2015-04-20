@@ -9,14 +9,20 @@ import time
 import numpy as np
 from itertools import permutations, combinations
 
+disagree_pairs = {}
+
 def get_tau_dist(cur_rank,ranks):
 	n_voters, n_candidates = ranks.shape
 	tau = 0
+	global disagree_pairs
 	for rank in ranks:
 		for i, j in combinations(range(n_candidates), 2):
 			if rank[i] < 0 or rank[j] < 0:
 				continue
-			tau += (cur_rank[i] - cur_rank[j])*(rank[i] - rank[j]) < 0
+			if (cur_rank[i] - cur_rank[j])*(rank[i] - rank[j]) < 0:
+				tau += 1
+				disagree_pairs.setdefault((i,j), 0)
+				disagree_pairs[(i,j)] += 1
 	return tau
 
 def distance_affected(cur_rank, ranks, index_a, index_b): # if the two index are close with, we don't need to compare all pairwise
@@ -47,7 +53,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 			new_tau = best_tau
 
 			while temperature > temperature_end:
-				index = random.sample(range(len(cur_rank)),2)
+				index = random.choice(disagree_pairs.keys())
 
 				new_rank = cur_rank.copy()
 				new_rank[index[0]], new_rank[index[1]] = new_rank[index[1]], new_rank[index[0]]
@@ -57,6 +63,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 				if diff < 0 or math.exp(-diff/temperature) > random.random():
 					cur_rank = new_rank # found move: new->cur
 					cur_tau = new_tau
+					del disagree_pairs[index]
 				else:
 					new_rank = cur_rank # no found move, so reset 
 					new_tau = cur_tau
@@ -96,5 +103,5 @@ def main():
 	end_time = time.time()
 	print new_rank, new_tau, end_time - start_time
 
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()

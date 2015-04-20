@@ -10,7 +10,8 @@ from tv_station import get_tv_station_rank
 BASE_DIR = os.path.dirname(__file__)
 
 def main():
-    websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
+    # websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
+    websites = [ u'爱奇艺', u'优酷', u'腾讯视频',u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'乐视网', u'迅雷看看', u'风行网']
     tv_station_list = [u'湖南卫视',u'东方卫视',u'安徽卫视',u'浙江卫视',u'北京卫视',
                         u'山东卫视',u'江苏卫视',u'江西卫视',u'河南卫视',u'重庆卫视',
                         u'东南卫视',u'广西卫视',u'四川卫视',u'广东卫视',u'吉林卫视',
@@ -41,7 +42,7 @@ def main():
     get_drama_rank(today, websites, drama_to_crawl, dramas_coll, today_drama_coll, drama_rank_coll)
 
     #################### 综艺 #####################
-    get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll)
+    get_variety_rank(today,websites, varieties_coll,today_variety_coll,variety_rank_coll)
 
     #################### 电视台 ####################
     get_tv_station_rank(today, websites, tv_station_list,tv_coll, varieties_coll, station_rank_coll)

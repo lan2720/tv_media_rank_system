@@ -10,8 +10,8 @@ def get_tv_station_rank(today, websites, tv_station_list,tv_coll, varieties_coll
     ranks = get_tv_station_ranks_from_db(websites, tv_station_list, tv_coll, varieties_coll)
     init_rank = find_init_rank(ranks)
     print "init station rank:", init_rank
-    new_rank, new_tau = annealing(ranks=ranks, cur_rank=init_rank, temperature_begin=300, temperature_end=0.1,
-                                  cooling_factor=.95, nb_iterations=200)
+    new_rank, new_tau = annealing(ranks=ranks, cur_rank=init_rank, temperature_begin=700, temperature_end=0.1,
+                                  cooling_factor=.95, nb_iterations=300)
     print "aggregated station rank:", new_rank, new_tau
 
     # 将排名存入数据库

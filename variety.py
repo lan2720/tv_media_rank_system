@@ -640,10 +640,9 @@ def get_varieties_playcount_and_store(keyword, varieties_coll, date): # a list
 	if count_results:
 		varieties_coll.update({'name': keyword, 'date': date}, {'$set': {'srcs': count_results}}, upsert=True)
 
-def get_variety_ranks_from_db(varieties_coll, today): # today is datetime.datetime
-	websites = [u'土豆', u'搜狐视频', u'华数TV', u'芒果TV', u'优酷', u'爱奇艺', u'腾讯视频', u'乐视网', u'迅雷看看', u'风行网']
+def get_variety_ranks_from_db(varieties_coll,websites, today): # today is datetime.datetime
 	today_str = today.strftime("%Y-%m-%d")
-    # 今日爬取的 且有资源的 都在varieties_coll里面 可用于排名
+	# 今日爬取的 且有资源的 都在varieties_coll里面 可用于排名
 	today_rank_list = [i['name'] for i in varieties_coll.find({'date': today_str}, {'name': 1, '_id': 0})]
 
 	rows = dict(zip(websites, range(10)))  # 10个视频网站
@@ -675,11 +674,11 @@ def get_variety_ranks_from_db(varieties_coll, today): # today is datetime.dateti
 	
 	return ranks, today_rank_list  # 用,分隔的
 
-def get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll):
+def get_variety_rank(today, websites, varieties_coll, today_variety_coll, variety_rank_coll):
 	today_variety_list = today_variety_coll.find_one({'date': today.strftime("%Y-%m-%d")}, {'varieties': 1, '_id': 0}, timeout=False)['varieties']
 	for variety in today_variety_list:
 		get_varieties_playcount_and_store(variety, varieties_coll, today.strftime("%Y-%m-%d"))
-	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll, today)
+	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll,websites, today)
 	print "#############全网 综艺 排名已完成##############"
 	init_rank = find_init_rank(ranks)
 	print "init variety rank:", init_rank
@@ -691,10 +690,3 @@ def get_variety_rank(today,varieties_coll,today_variety_coll,variety_rank_coll):
 	get_trans(init_rank, today_rank_list, variety_rank_coll, today)
 	print "#############每日 综艺 排名已完成存储############"
 
-def test():
-	last_fri = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y%m%d")
-	today = datetime.datetime.now().strftime("%Y%m%d")
-	search_in_baidu('群英会',last_fri,today)
-
-if __name__ == '__main__':
-	test()
