@@ -21,7 +21,7 @@ def get_tau_dist(cur_rank,ranks):
 				continue
 			if (cur_rank[i] - cur_rank[j])*(rank[i] - rank[j]) < 0:
 				tau += 1
-				disagree_pairs.setdefault((i,j), 0)
+				disagree_pairs.setdefault((i,j), 0) # 这里的i,j都是排名对象
 				disagree_pairs[(i,j)] += 1
 	return tau
 
@@ -43,7 +43,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 	n_voters, n_candidates = ranks.shape
 	best_rank = cur_rank[:]
 	best_tau = get_tau_dist(best_rank, ranks)
-
+	global disagree_pairs
 	try:
 		for iteration in range(nb_iterations):
 			temperature = temperature_begin # every iter begins from the same temperature
