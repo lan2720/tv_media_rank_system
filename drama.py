@@ -62,8 +62,9 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                         if u"：" not in name or u'精编' in name:
                             continue
                         else:
-                            name = name.split(u"：")[-1].strip(repl)
-                            name = re.sub('[,.?!~`·+*&%#{}|"<>]+',"",name)
+                            name = name.split(u"：")[-1].strip(repl) # 已经是utf-8
+                            #name = name#.decode('utf-8')
+                            name = re.sub("[\s+\.\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name) 
                             if name == u'嗨，老头！':
                                 name = u'嘿老头'
                             dramas.setdefault(name, None)
@@ -81,7 +82,7 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                             continue
                         else:
                             name = re.sub(pat, "", name.split(u'：')[0])  # 去除"重播"
-                            name = re.sub('[,.?!~`·+*&%#{}|"<>]+',"",name)
+                            name = re.sub("[\s+\.·\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name)
                             # name = name.replace(u'·', '')  # 大王·小王
                             varieties.setdefault(name, None)
                             all_variety_today.setdefault(name, None)
