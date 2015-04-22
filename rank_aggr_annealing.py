@@ -54,6 +54,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 
 			while temperature > temperature_end:
 				index = random.choice(disagree_pairs.keys())
+				# print index
 
 				new_rank = cur_rank.copy()
 				new_rank[index[0]], new_rank[index[1]] = new_rank[index[1]], new_rank[index[0]]
@@ -64,6 +65,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 					cur_rank = new_rank # found move: new->cur
 					cur_tau = new_tau
 					del disagree_pairs[index]
+					# print cur_tau
 				else:
 					new_rank = cur_rank # no found move, so reset 
 					new_tau = cur_tau

@@ -204,9 +204,9 @@ def iqiyi_variety_parser(url):
 													 }, timeout = 2, allow_redirects = False).text
 			vid = re.search(vid_pat, main_page).group().strip()
 		except (socket.timeout, requests.exceptions.Timeout):
-			print "timeout", count_url
+			print "timeout", url
 		except requests.exceptions.ConnectionError:
-			print "connection error", count_url
+			print "connection error", url
 		except AttributeError:
 			try_time += 1
 			if try_time == 5:
