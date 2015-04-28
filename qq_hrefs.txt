@@ -22,7 +22,6 @@ http://ent.qq.tvsou.com/pst/tv_18/ch_40/W{}.xml	陕西卫视
 http://ent.qq.tvsou.com/pst/tv_26/ch_48/W{}.xml	贵州卫视
 http://ent.qq.tvsou.com/pst/tv_15/ch_37/W{}.xml	河北卫视
 http://ent.qq.tvsou.com/pst/tv_12/ch_34/W{}.xml	黑龙江卫视
-http://ent.qq.tvsou.com/pst/tv_31/ch_53/W{}.xml	宁夏卫视
 http://ent.qq.tvsou.com/pst/tv_114/ch_592/W{}.xml	青海卫视
 http://ent.qq.tvsou.com/pst/tv_30/ch_52/W{}.xml	甘肃卫视
 http://ent.qq.tvsou.com/pst/tv_34/ch_56/W{}.xml	内蒙古卫视

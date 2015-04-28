@@ -63,8 +63,9 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                             continue
                         else:
                             name = name.split(u"：")[-1].strip(repl) # 已经是utf-8
+                            name = name.split(' ')[0] # 有的以空格分隔 
                             #name = name#.decode('utf-8')
-                            name = re.sub("[\s+\.\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name) 
+                            name = re.sub("[\s+\.·\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name) 
                             if name == u'嗨，老头！':
                                 name = u'嘿老头'
                             dramas.setdefault(name, None)
@@ -78,11 +79,13 @@ def get_a_day_tv_list(day_of_week, tv_coll, today_drama_coll, today_variety_coll
                                 or u'纪录片' in name or u'气象' in name or u'娱乐' in name or u'看点' in name \
                                 or u'歌曲' in name or u'电影' in name or u'影院' in name or u'预告' in name \
                                 or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'盛典' in name \
-                                or u'海峡' in name or u'金穗双联' in name or u'年度人物' in name or u'开幕式' in name:
+                                or u'海峡' in name or u'金穗双联' in name or u'年度人物' in name or u'开幕式' in name \
+                                or u'颁奖' in name or u'节目' in name:
                             continue
                         else:
                             name = re.sub(pat, "", name.split(u'：')[0])  # 去除"重播"
-                            name = re.sub("[\s+\.·\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name)
+                            name = name.split(' ')[0] # 有的以空格分隔 
+                            name = re.sub("[\s+\.·\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name)
                             # name = name.replace(u'·', '')  # 大王·小王
                             varieties.setdefault(name, None)
                             all_variety_today.setdefault(name, None)
@@ -126,7 +129,8 @@ def get_a_week_drama_variety():
                                 continue
                             else:
                                 name = name.split(u"：")[-1].strip(repl)
-                                name = re.sub('[,.?!~`·+*&%#{}|"<>]+',"",name)
+                                name = name.split(' ')[0] # 有的以空格分隔
+                                name = re.sub("[\s+\.·\!\/_,$%^*(+\"\'0123456789]+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name)
                                 if name == u'嗨，老头！':
                                     name = u'嘿老头'
                                 dramas.setdefault(name, None)
@@ -139,12 +143,14 @@ def get_a_week_drama_variety():
                                     or u'纪录片' in name or u'气象' in name or u'娱乐' in name or u'看点' in name \
                                     or u'歌曲' in name or u'电影' in name or u'影院' in name or u'预告' in name \
                                     or u'旅游' in name or u'南粤' in name or u'内蒙古' in name or u'盛典' in name \
-                                    or u'海峡' in name or u'金穗双联' in name or u'年度人物' in name or u'开幕式' in name:
+                                    or u'海峡' in name or u'金穗双联' in name or u'年度' in name or u'开幕式' in name \
+                                    or u'颁奖' in name or u'节目' in name:
                                 continue
                             else:
                                 name = re.sub(pat, "", name.split(u'：')[0])  # 去除"重播"
+                                name = name.split(' ')[0] # 有的以空格分隔 
                                 # name = name.replace(u'·', '')  # 大王·小王
-                                name = re.sub('[,.?!~`·+*&%#{}|"<>]+',"",name)
+                                name = re.sub("[\s+\.·\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+".decode("utf-8"), "".decode("utf-8"),name)
                                 varieties.setdefault(name, None)
                                 print name, "variety"
                         else:

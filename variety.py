@@ -671,7 +671,7 @@ def get_variety_ranks_from_db(varieties_coll,websites, today): # today is dateti
 
 		for val, idx in rank.iteritems():
 			a[pos_dic[val]] = idx + 1
-	
+
 	return ranks, today_rank_list  # 用,分隔的
 
 def get_variety_rank(today, websites, varieties_coll, today_variety_coll, variety_rank_coll):
@@ -679,6 +679,8 @@ def get_variety_rank(today, websites, varieties_coll, today_variety_coll, variet
 	for variety in today_variety_list:
 		get_varieties_playcount_and_store(variety, varieties_coll, today.strftime("%Y-%m-%d"))
 	ranks, today_rank_list = get_variety_ranks_from_db(varieties_coll,websites, today)
+	for rank in ranks:
+		print rank
 	print "#############全网 综艺 排名已完成##############"
 	init_rank = find_init_rank(ranks)
 	print "init variety rank:", init_rank
