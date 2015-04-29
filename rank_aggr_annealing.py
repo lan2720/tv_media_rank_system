@@ -9,12 +9,11 @@ import time
 import numpy as np
 from itertools import permutations, combinations
 
-disagree_pairs = {}
 
-def get_tau_dist(cur_rank,ranks):
+
+def get_tau_dist(cur_rank,ranks, disagree_pairs):
 	n_voters, n_candidates = ranks.shape
 	tau = 0
-	global disagree_pairs
 	for rank in ranks:
 		for i, j in combinations(range(n_candidates), 2):
 			if rank[i] < 0 or rank[j] < 0:
@@ -41,9 +40,10 @@ def distance_affected(cur_rank, ranks, index_a, index_b): # if the two index are
 
 def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, cooling_factor=.9, nb_iterations=1):
 	n_voters, n_candidates = ranks.shape
+	disagree_pairs = {}
 	best_rank = cur_rank[:]
-	best_tau = get_tau_dist(best_rank, ranks)
-	global disagree_pairs
+	best_tau = get_tau_dist(best_rank, ranks, disagree_pairs)
+
 	try:
 		for iteration in range(nb_iterations):
 			temperature = temperature_begin # every iter begins from the same temperature
@@ -58,7 +58,7 @@ def annealing(ranks, cur_rank, temperature_begin=1.0e+100, temperature_end=.1, c
 
 				new_rank = cur_rank.copy()
 				new_rank[index[0]], new_rank[index[1]] = new_rank[index[1]], new_rank[index[0]]
-				new_tau = get_tau_dist(new_rank,ranks)
+				new_tau = get_tau_dist(new_rank,ranks, disagree_pairs)
 
 				diff = new_tau - cur_tau # cur_tau is the best tau we get now 
 				if diff < 0 or math.exp(-diff/temperature) > random.random():
