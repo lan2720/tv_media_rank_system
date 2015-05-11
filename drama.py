@@ -504,6 +504,7 @@ def youku_parser(url):  # something to promotion 没问题
         vid = re.search(pattern, url).group()
     except AttributeError:
         print "youku vid get error."
+        return 0
     else:
         url_get_data = 'http://v.youku.com/v_vpactionInfo/id/{}/pm/3?&__ro=info_stat'.format(vid)
         while True:
@@ -567,6 +568,7 @@ def xunlei_parser(url):  # 播放数与页面上显示的不符
     # print vid
     except AttributeError:
         print 'error url, no vid received.'
+        return 0
     else:
         js_url = 'http://api.movie.kankan.com/vodjs/moviedata/{}.js'.format(vid)
         vv_pattern = re.compile(r'(?<=totle_vv=\').*(?=\';)', re.M)

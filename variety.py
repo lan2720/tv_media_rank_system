@@ -573,6 +573,7 @@ def youku_variety_parser(url):
 			break
 	count_url = 'http://v.youku.com/v_vpactionInfo/id/{}/pm/3?__rt=1&__ro=info_stat'.format(vid)
 	try_time = 0
+	play_count = 0
 	while True:
 		try:
 			count_page = requests.get(count_url, headers = {'Accept':accept,
@@ -602,6 +603,7 @@ def qq_variety_parser(url):
 	count_pat = re.compile(r'(?<="all":).*?(?=,")', re.M)
 	vid = url.split('/')[-1].split('.')[0]
 	count_url = 'http://sns.video.qq.com/tvideo/fcgi-bin/batchgetplaymount?callback=jQuery1910056143816793337464_1428574983123&low_login=1&id={}&otype=json&_=1428574983124'.format(vid)
+	play_count = 0
 	while True:
 		try:
 			count_page = requests.get(count_url, headers = {}, timeout = 2, allow_redirects = False).text
