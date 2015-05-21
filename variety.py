@@ -551,27 +551,14 @@ def tudou_variety_parser(url): #, today, last_fri):
 	return play_count
 
 def youku_variety_parser(url):
-	vid_pat = re.compile(r'(?<=videoId = \').*?(?=\';)',re.M)
-	while True:
-		try:
-			main_page = requests.get(url, headers = {'Accept':accept,
-											 'Accept-Encoding':encode,
-											 'Accept-Language':chinese,
-											 'Cache-Control':no_cache,
-											 'Connection':connection,
-											 'Host':'v.youku.com',
-											 'User-Agent':chrome},timeout = 2, allow_redirects = False).text
-			vid = re.search(vid_pat, main_page).group()
-			# play_count = int(pq(main_page)('div#item_'+iid)('a')('div.statplay').text().replace(',',''))
-		except (socket.timeout, requests.exceptions.Timeout):
-			print "timeout", url
-		except requests.exceptions.ConnectionError:
-			print "connection error", url
-		except AttributeError:
-			print "youku vid no found"
-		else:
-			break
-	count_url = 'http://v.youku.com/v_vpactionInfo/id/{}/pm/3?__rt=1&__ro=info_stat'.format(vid)
+	pattern = re.compile(r'(?<=id_).*?(?=\.html)')
+	try:
+		vid = re.search(pattern, url).group()
+	except AttributeError:
+		print "youku vid get error."
+		return 0
+	else:
+		count_url = 'http://v.youku.com/v_vpactionInfo/id/{}/pm/3?__rt=1&__ro=info_stat'.format(vid)
 	try_time = 0
 	play_count = 0
 	while True:
@@ -583,7 +570,7 @@ def youku_variety_parser(url):
 															'Host':'v.youku.com',
 															'Referer':url,
 															'User-Agent':chrome}, timeout = 2, allow_redirects = False).text
-			play_count = int(pq(count_page)('div.common').eq(0)('ul.half').eq(0)('span.num').text().replace(',', ''))
+			play_count = int(pq(count_page)('div.common').eq(2)('span.num').eq(0).text().replace(',', ''))
 		except (socket.timeout, requests.exceptions.Timeout):
 			print "timeout", count_url
 		except requests.exceptions.ConnectionError:
@@ -692,3 +679,5 @@ def get_variety_rank(today, websites, varieties_coll, today_variety_coll, variet
 	get_trans(init_rank, today_rank_list, variety_rank_coll, today)
 	print "#############每日 综艺 排名已完成存储############"
 
+if __name__ == '__main__':
+	print youku_variety_parser('http://v.youku.com/v_show/id_XOTU3NDA3MDky.html?from=s1.8-3-1.1')
