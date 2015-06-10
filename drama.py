@@ -312,7 +312,7 @@ def sohu_parser(url):  # 没问题
     except AttributeError:
         count_url = 'http://count.vrs.sohu.com/count/queryext.action?vids={}&plids={}&callback=playCountVrs'.format(vid,plid)
     else:
-        print oplid
+        # print oplid
         count_url = 'http://count.vrs.sohu.com/count/queryext.action?vids={}&plids={},{}&callback=playCountVrs'.format(vid, plid, oplid)
     try_time = 0
     print count_url
@@ -419,7 +419,7 @@ def iqiyi_parser(url):  # 没问题
 #     return playcount
 def hunan_parser(url): # 改版
     vid  = url.split('/')[-1].split('.')[0]
-    print vid
+    # print vid
     count_url = 'http://videocenter-2039197532.cn-north-1.elb.amazonaws.com.cn/dynamicinfo?callback=jQuery18206827334458939731_1433925943689&vid={}&_=1433925944085'.format(vid)
     count_pat = re.compile(r'(?<="allVV":)\d+(?=,")', re.M)
     try_time = 0
@@ -458,7 +458,7 @@ def letv_parser(url):  # 没问题
                                 allow_redirects=False)  #'ISO-8859-1'
             page.encoding = 'utf-8'
             pid = re.search(pid_pattern, page.text).group()
-            print pid
+            # print pid
         except (socket.timeout, requests.exceptions.Timeout):
             print "timeout", url
         except requests.exceptions.ConnectionError:
@@ -654,7 +654,7 @@ def wasu_parser(url):  # 没问题
     for each_show in pq(base_page)('#play_tipbox1')('a'):
         show_id = pq(each_show).attr('href').split('/')[-1]
         data_url = 'http://uc.wasu.cn/Ajax/updateViewHit/id/{}/pid/11/dramaId/{}'.format(show_id, drama_id)
-        print data_url
+        # print data_url
         while True:
             try:
                 cnt = requests.get(data_url, headers={'Host': 'uc.wasu.cn',
