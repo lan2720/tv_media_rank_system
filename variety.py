@@ -64,6 +64,7 @@ def search_in_baidu(keyword, last_fri, today):
 			continue
 		else:	# 找到第一个综艺节目就退出
 			vid = result['id']
+			print vid
 			found = True
 			break
 			
@@ -83,7 +84,7 @@ def search_in_baidu(keyword, last_fri, today):
 	srcs = {} # 存结果的
 	for chinese_name, site in sites.iteritems(): # key is url, value is site name
 		findSrc_url = 'http://app.video.baidu.com/xqsingle/?cuid=4ae93cc8602f3278825826136a249e39ee843a9d&id={}&worktype=iphnativetvshow&year=2015&time={:.6f}&version=6.2.2&site={}'.format(vid, time.time(),site)
-		# print findSrc_url
+		print findSrc_url
 		while True:
 			try:
 				srcs_page = requests.get(findSrc_url, headers = {'Host':'app.video.baidu.com',
@@ -680,4 +681,5 @@ def get_variety_rank(today, websites, varieties_coll, today_variety_coll, variet
 	print "#############每日 综艺 排名已完成存储############"
 
 if __name__ == '__main__':
-	print youku_variety_parser('http://v.youku.com/v_show/id_XOTU3NDA3MDky.html?from=s1.8-3-1.1')
+	# print youku_variety_parser('http://v.youku.com/v_show/id_XOTU3NDA3MDky.html?from=s1.8-3-1.1')
+	print search_in_baidu("传奇故事", "20150516","20150523")

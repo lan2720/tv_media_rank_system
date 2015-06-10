@@ -244,6 +244,7 @@ def tudou_parser(url):  # 没问题
             break
     # 请求iid_list的页面url需要lid号
     iids_url = 'http://www.tudou.com/tvp/alist.action?jsoncallback=page_play_model_aListModelList__findAll&areaCode=310000&a={}&app=4'.format(lid)
+    print iids_url
     while True:
         try:
             iids_page = requests.get(iids_url, headers={'Referer': url, 'User-Agent': chrome}, timeout=2).text
@@ -291,6 +292,7 @@ def sohu_parser(url):  # 没问题
             page.encoding = 'utf-8'
             vid = re.search(vid_pat, page.text).group()
             plid = re.search(plid_pat, page.text).group()
+            print vid,plid
         except (socket.timeout, requests.exceptions.Timeout):
             print "timeout", url
         except requests.exceptions.ConnectionError:
@@ -310,8 +312,10 @@ def sohu_parser(url):  # 没问题
     except AttributeError:
         count_url = 'http://count.vrs.sohu.com/count/queryext.action?vids={}&plids={}&callback=playCountVrs'.format(vid,plid)
     else:
+        print oplid
         count_url = 'http://count.vrs.sohu.com/count/queryext.action?vids={}&plids={},{}&callback=playCountVrs'.format(vid, plid, oplid)
     try_time = 0
+    print count_url
     while True:
         try:
             amount = requests.get(count_url, headers={'Host': 'count.vrs.sohu.com', 'Referer': url}, timeout=2,
@@ -376,43 +380,70 @@ def iqiyi_parser(url):  # 没问题
     return int(playcount)
 
 
-def hunan_parser(url):  # 没问题
+# def hunan_parser(url):  # 没问题
+#     while True:
+#         try:
+#             base_page = requests.get(url, headers={'Host': 'www.hunantv.com', 'User-Agent': chrome}, timeout=2,
+#                                      allow_redirects=False)  #.text
+#         except (socket.timeout, requests.exceptions.Timeout):
+#             print "timeout", url
+#         except requests.exceptions.ConnectionError:
+#             print "connection error", url
+#         else:
+#             break
+#     base_page.encoding = 'utf-8'
+
+#     click_pat = re.compile(r'(?<="click":").*(?=",)')
+#     playcount = 0
+#     for each in pq(base_page.text)('#tvplay-box')('li'):
+#         vid = pq(each).attr('id').split('-')[-1]
+#         print vid
+#         data_url = 'http://click.hunantv.com/get.php?callback=jQuery18208550447486341_1426752637357&aid={}&type=videos&_=1426752637423'.format(vid)
+#         while True:
+#             try:
+#                 data_page = requests.get(data_url,
+#                                          headers={'Host': 'click.hunantv.com', 'Referer': url, 'User-Agent': chrome},
+#                                          timeout=2, allow_redirects=False).text
+#             except (socket.timeout, requests.exceptions.Timeout):
+#                 print "timeout", data_url
+#             except requests.exceptions.ConnectionError:
+#                 print "connection error", data_url
+#             else:
+#                 break
+#         count = re.search(click_pat, data_page).group()
+#         if count[-1] == u'万':
+#             count = int(count[:-1]) * 10000
+#         else:
+#             count = int(count.replace(',', ''))
+#         playcount += count
+#     return playcount
+def hunan_parser(url): # 改版
+    vid  = url.split('/')[-1].split('.')[0]
+    print vid
+    count_url = 'http://videocenter-2039197532.cn-north-1.elb.amazonaws.com.cn/dynamicinfo?callback=jQuery18206827334458939731_1433925943689&vid={}&_=1433925944085'.format(vid)
+    count_pat = re.compile(r'(?<="allVV":)\d+(?=,")', re.M)
+    try_time = 0
     while True:
         try:
-            base_page = requests.get(url, headers={'Host': 'www.hunantv.com', 'User-Agent': chrome}, timeout=2,
-                                     allow_redirects=False)  #.text
+            data_page = requests.get(count_url,
+                                     headers={'Host': 'videocenter-2039197532.cn-north-1.elb.amazonaws.com.cn', 'Referer': url, 'User-Agent': chrome},
+                                     timeout=2, allow_redirects=False).text
+            # print data_page
+            playcount = re.search(count_pat, data_page).group()
         except (socket.timeout, requests.exceptions.Timeout):
-            print "timeout", url
+            print "timeout", count_url
         except requests.exceptions.ConnectionError:
-            print "connection error", url
+            print "connection error", count_url
+        except AttributeError:
+            try_time += 1
+            if try_time == 5:
+                return 0
+            else:
+                print "response page error. no playcount found. try again."
+                print count_url
         else:
             break
-    base_page.encoding = 'utf-8'
-
-    click_pat = re.compile(r'(?<="click":").*(?=",)')
-    playcount = 0
-    for each in pq(base_page.text)('#tvplay-box')('li'):
-        vid = pq(each).attr('id').split('-')[-1]
-        data_url = 'http://click.hunantv.com/get.php?callback=jQuery18208550447486341_1426752637357&aid={}&type=videos&_=1426752637423'.format(vid)
-        while True:
-            try:
-                data_page = requests.get(data_url,
-                                         headers={'Host': 'click.hunantv.com', 'Referer': url, 'User-Agent': chrome},
-                                         timeout=2, allow_redirects=False).text
-            except (socket.timeout, requests.exceptions.Timeout):
-                print "timeout", data_url
-            except requests.exceptions.ConnectionError:
-                print "connection error", data_url
-            else:
-                break
-        count = re.search(click_pat, data_page).group()
-        if count[-1] == u'万':
-            count = int(count[:-1]) * 10000
-        else:
-            count = int(count.replace(',', ''))
-        playcount += count
-    return playcount
-
+    return int(playcount)
 
 def letv_parser(url):  # 没问题
     pid_pattern = re.compile(r'(?<=pid:)\d+', re.M)
@@ -427,6 +458,7 @@ def letv_parser(url):  # 没问题
                                 allow_redirects=False)  #'ISO-8859-1'
             page.encoding = 'utf-8'
             pid = re.search(pid_pattern, page.text).group()
+            print pid
         except (socket.timeout, requests.exceptions.Timeout):
             print "timeout", url
         except requests.exceptions.ConnectionError:
@@ -603,6 +635,7 @@ def wasu_parser(url):  # 没问题
                                                    'User-Agent': chrome}, timeout=4, allow_redirects=False).text
             dramaId_pat = re.compile(r'(?<="/dramaId/"\+)\d+(?=\+)')
             drama_id = re.search(dramaId_pat, base_page).group()
+            # print("drama id: {}".format(drama_id))
         except (socket.timeout, requests.exceptions.Timeout):
             print "timeout", url
         except requests.exceptions.ConnectionError:
@@ -800,4 +833,9 @@ def get_drama_rank(today, websites, drama_to_crawl, dramas_coll, today_drama_col
     get_trans(new_rank, today_rank_list, drama_rank_coll, today)
     print "#############每日 电视剧 排名已完成存储############"
 
-
+if __name__ == '__main__':
+    # print youku_parser('http://v.youku.com/v_show/id_XOTU3NDA3MDky.html?from=s1.8-3-3.1')
+    # print tudou_parser('http://www.tudou.com/albumplay/NZRgBwCFJUg/zKNfPorXDM8.html')
+    # print wasu_parser('http://www.wasu.cn/Play/show/id/5981659')
+    print hunan_parser('http://www.hunantv.com/v/2/108430/f/1128323.html')
+    # print letv_parser('http://www.letv.com/ptv/vplay/22673216.html#vid=22673216')
